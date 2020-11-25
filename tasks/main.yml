@@ -1,0 +1,19 @@
+---
+- name: Install python-apt - need move to deps or pre_tasks
+  apt:
+    name:
+      - python-apt
+    state: present
+
+- name: get the rpm or apt package facts
+  package_facts:
+    manager: "apt"
+
+- name: install nginx
+  import_tasks: installation.yml
+  when: (ansible_facts['packages']['nginx'] is undefined) or (ansible_facts['packages']['nginx'][0].version != docker_version)
+
+- name: Replace index.html
+  template:
+    src=templates/index.html
+    dest=/var/www/html/index.html
